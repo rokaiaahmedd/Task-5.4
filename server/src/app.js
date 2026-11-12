@@ -6,7 +6,8 @@ import authRoutes from './routes/auth.js';
 import bookingRoutes from './routes/bookings.js';
 import userRoutes from './routes/users.js';
 import maintenanceRoutes from './routes/maintenance.js';
-
+import { generateCsrfToken } from './middleware/csrf.js';
+import { requireAuth } from './middleware/auth.js';
 const app = express();
 
 app.use(morgan('dev'));
@@ -18,6 +19,12 @@ app.use(express.json());
 // which needs no JavaScript and triggers no CORS preflight) is understood.
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.get('/api/csrf-token', requireAuth, (req, res) => {
+  const csrfToken = generateCsrfToken(req, res);
+
+  res.json({ csrfToken });
+});
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
